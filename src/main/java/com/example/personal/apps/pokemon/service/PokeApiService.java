@@ -1,13 +1,13 @@
 package com.example.personal.apps.pokemon.service;
 
+import com.example.personal.apps.pokemon.dto.AbstractPokemonDTO;
 import com.example.personal.apps.pokemon.dto.PokemonDTO;
+import com.example.personal.apps.pokemon.utils.threads.Master;
+import com.example.personal.apps.pokemon.utils.threads.Worker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,25 +25,31 @@ public class PokeApiService {
         }
 
         startTime = System.nanoTime();
-        for (Integer id : pokemonIds) {
-            PokemonDTO currentPokemon = new PokemonDTO();
-            currentPokemon = consumirServicio("", id);
-            LOGGER.info("Información del pokemón recibida: ");
-            LOGGER.info(currentPokemon.toString());
+
+        List<PokemonDTO> result = getPokemonDataByWorkers(pokemonIds);
+        LOGGER.info("Lista de pokemón encontrada:");
+        for (PokemonDTO pokemon :
+                result) {
+            LOGGER.info(pokemon.toString());
         }
 
         endTime = System.nanoTime();
         return "Duración: " + (endTime-startTime)/1e6 + " ms";
     }
 
-    private PokemonDTO consumirServicio(String request, Integer id) {
-        String baseUrl = "https://pokeapi.co/api/v2/pokemon/%d";
-        String URL = String.format(baseUrl, id);
-        RestTemplate cliente = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("text", "plain", StandardCharsets.UTF_8));
-        HttpEntity<String> entity = new HttpEntity<>(request, headers);
-        return cliente.exchange(URL, HttpMethod.GET, entity, PokemonDTO.class).getBody();
+    private List<PokemonDTO> getPokemonDataByWorkers(List<Integer> pokemonIds){
+        Master master = new Master(new Worker(), pokemonIds.size() / 10 > 20? 10 : pokemonIds.size() / 10);
+
+        for (Integer pokemonId : pokemonIds) {
+            master.submit(new AbstractPokemonDTO(pokemonId));
+        }
+
+        master.execute();
+
+        while (!master.isComplete()){
+            //Espero a que terminen de ejecutarse todos los hilos
+        }
+        return new ArrayList<>(master.getResultMap());
     }
 
 }

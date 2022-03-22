@@ -1,5 +1,6 @@
 package com.example.personal.apps.pokemon.utils.threads;
 
+import com.example.personal.apps.pokemon.dto.AbstractPokemonDTO;
 import com.example.personal.apps.pokemon.dto.PokemonDTO;
 
 import java.util.*;
@@ -7,7 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Master {
 
-    protected Queue<PokemonDTO> workQueue =
+    protected Queue<AbstractPokemonDTO> workQueue =
             new ConcurrentLinkedQueue<>();
 
     protected Map<String, Thread> threadMap =
@@ -34,7 +35,7 @@ public class Master {
         return true;
     }
 
-    public void submit(PokemonDTO job) {
+    public void submit(AbstractPokemonDTO job) {
         workQueue.add(job);
     }
 
