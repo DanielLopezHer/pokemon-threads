@@ -24,7 +24,7 @@ public class PokeApiController {
     @GetMapping()
     public String getPokeInfo(){
         LOGGER.info("Llamado al endpoint de búsqueda simple de información de pokemón");
-        pokeApiService.getInfoPokemon();
-        return "Búsqueda terminada.";
+        String response = pokeApiService.getInfoPokemon();
+        return "Búsqueda terminada.\n" + response;
     }
 }

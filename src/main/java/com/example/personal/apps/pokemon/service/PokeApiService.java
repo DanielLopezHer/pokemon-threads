@@ -15,14 +15,16 @@ import java.util.List;
 public class PokeApiService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PokeApiService.class);
 
-    public void getInfoPokemon(){
+    public String getInfoPokemon(){
         LOGGER.info("Iniciando la búsqueda de los pokemón.");
         List<Integer> pokemonIds = new ArrayList<>();
-        List<PokemonDTO> pokemons = new ArrayList<>();
-        for(int i = 1; i < 10; i++){
+        long startTime = 0;
+        long endTime = 0;
+        for(int i = 1; i < 899; i++){
             pokemonIds.add(i);
         }
 
+        startTime = System.nanoTime();
         for (Integer id : pokemonIds) {
             PokemonDTO currentPokemon = new PokemonDTO();
             currentPokemon = consumirServicio("", id);
@@ -30,6 +32,8 @@ public class PokeApiService {
             LOGGER.info(currentPokemon.toString());
         }
 
+        endTime = System.nanoTime();
+        return "Duración: " + (endTime-startTime)/1e6 + " ms";
     }
 
     private PokemonDTO consumirServicio(String request, Integer id) {
