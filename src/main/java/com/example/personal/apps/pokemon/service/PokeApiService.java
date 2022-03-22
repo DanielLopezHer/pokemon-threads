@@ -27,9 +27,9 @@ public class PokeApiService {
         startTime = System.nanoTime();
 
         List<PokemonDTO> result = getPokemonDataByWorkers(pokemonIds);
+
         LOGGER.info("Lista de pokemón encontrada:");
-        for (PokemonDTO pokemon :
-                result) {
+        for (PokemonDTO pokemon : result) {
             LOGGER.info(pokemon.toString());
         }
 
@@ -38,7 +38,7 @@ public class PokeApiService {
     }
 
     private List<PokemonDTO> getPokemonDataByWorkers(List<Integer> pokemonIds){
-        Master master = new Master(new Worker(), pokemonIds.size() / 10 > 20? 10 : pokemonIds.size() / 10);
+        Master master = new Master(new Worker(), pokemonIds.size() / 10 > 20? 20 : pokemonIds.size() / 10);
 
         for (Integer pokemonId : pokemonIds) {
             master.submit(new AbstractPokemonDTO(pokemonId));
